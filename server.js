@@ -14,8 +14,8 @@ app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 
 // Routes
-app.use('/api/auth', authRoutes);
-app.use('/api/users', userRoutes);
+app.use('/register', authRoutes);
+// app.use('/login', userRoutes);
 
 // Start server
 app.listen(PORT, () => {

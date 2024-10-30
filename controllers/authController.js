@@ -20,21 +20,21 @@ exports.register = (req, res) => {
     });
 };
 
-exports.login = (req, res) => {
-    const { email, password } = req.body;
+// exports.login = (req, res) => {
+//     const { email, password } = req.body;
 
-    const query = 'SELECT * FROM users WHERE email = ?';
-    db.query(query, [email], (error, results) => {
-        if (error || results.length === 0) {
-            return res.status(401).json({ message: 'Auth failed' });
-        }
+//     const query = 'SELECT * FROM users WHERE email = ?';
+//     db.query(query, [email], (error, results) => {
+//         if (error || results.length === 0) {
+//             return res.status(401).json({ message: 'Auth failed' });
+//         }
 
-        // Compare passwords
-        bcrypt.compare(password, results[0].password, (err, isMatch) => {
-            if (err || !isMatch) {
-                return res.status(401).json({ message: 'Auth failed' });
-            }
-            res.status(200).json({ message: 'Auth successful' });
-        });
-    });
-};
+//         // Compare passwords
+//         bcrypt.compare(password, results[0].password, (err, isMatch) => {
+//             if (err || !isMatch) {
+//                 return res.status(401).json({ message: 'Auth failed' });
+//             }
+//             res.status(200).json({ message: 'Auth successful' });
+//         });
+//     });
+// };
