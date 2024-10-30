@@ -1,6 +1,6 @@
 const db = require('../config/db');
 
-exports.register = async (req, res) => {
+exports.saveData = async (req, res) => {
     const { category, price, date } = req.body;
 
     try {
@@ -15,7 +15,7 @@ exports.register = async (req, res) => {
                 console.error('Database error:', err);
                 return res.status(500).json({ error: 'Database error' });
             }
-            res.status(201).json({ message: 'User registered successfully' });
+            res.status(201).json({ message: 'Data Save successfully' });
         });
     } catch (error) {
         console.error('Internal error:', error);
