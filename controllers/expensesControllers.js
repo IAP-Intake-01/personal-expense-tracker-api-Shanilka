@@ -1,5 +1,6 @@
 const db = require('../config/db');
 
+// save funtion
 exports.saveData = async (req, res) => {
     const { category, price, date } = req.body;
 
@@ -23,7 +24,7 @@ exports.saveData = async (req, res) => {
     }
 };
 
-
+//  getAll funtion
 exports.getAllExpenses = (req, res) => {
     const query = 'SELECT * FROM expenses';
 
@@ -34,5 +35,22 @@ exports.getAllExpenses = (req, res) => {
         }
 
         res.json(results);
+    });
+};
+
+// delete funtion
+exports.deleteExpense = (req, res) => {
+    const expenseId = req.params.id;
+    const query = 'DELETE FROM expenses WHERE id = ?';
+
+    db.query(query, [expenseId], (err, result) => {
+        if (err) {
+            console.error('Database error:', err);
+            return res.status(500).json({ error: 'Database error' });
+        }
+        if (result.affectedRows === 0) {
+            return res.status(404).json({ error: 'Expense not found' });
+        }
+        res.status(200).json({ message: 'Expense deleted successfully' });
     });
 };
