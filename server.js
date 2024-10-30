@@ -1,29 +1,27 @@
-// server.js
 const express = require('express');
 const bodyParser = require('body-parser');
-const bcrypt = require('bcrypt');
 const mysql = require('mysql');
-const corse = require('cors')
+require('dotenv').config();
+
+const authRoutes = require('./routes/authRoutes');
+const userRoutes = require('./routes/userRoutes');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
 
 // Middleware
-app.use(bodyParser.json()); // Parse JSON bodies
-app.use(corse())
+app.use(bodyParser.json());
+app.use(bodyParser.urlencoded({ extended: true }));
 
-// MySQL Connection
-const db = mysql.createConnection({
-    host: 'localhost',
-    user: 'root',
-    password: 'Shanilka800@#',
-    database: 'my_expenses',
+// Routes
+app.use('/api/auth', authRoutes);
+app.use('/api/users', userRoutes);
+
+// Start server
+app.listen(PORT, () => {
+    console.log(`Server is running on http://localhost:${PORT}`);
 });
 
-db.connect(err => {
-    if (err) throw err;
-    console.log('Connected to MySQL database');
-});
 
 // Registration API Endpoint
 app.post('/register', async (req, res) => {
