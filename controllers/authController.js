@@ -28,36 +28,45 @@ exports.register = async (req, res) => {
 };
 
 
-exports.login = (req, res) => {
-    const { email, password } = req.body;
+// exports.login = (req, res) => {
+//     const { email, password } = req.body;
 
-    // Check if email and password are provided
-    if (!email || !password) {
-        return res.status(400).json({ error: 'Email and password are required' });
-    }
+//     if (!email || !password) {
+//         return res.status(400).json({ error: 'Email and password are required' });
+//     }
 
-    // Query to find the user by email
-    const query = 'SELECT * FROM users WHERE email = ?';
-    db.query(query, [email], async (err, results) => {
-        if (err) {
-            console.error('Database error:', err);
-            return res.status(500).json({ error: 'Database error' });
-        }
+//     const query = 'SELECT * FROM users WHERE email = ?';
+//     db.query(query, [email], async (err, results) => {
+//         if (err) {
+//             console.error('Database error:', err);
+//             return res.status(500).json({ error: 'Database error' });
+//         }
 
-        if (results.length === 0) {
-            return res.status(401).json({ error: 'Invalid email or password' });
-        }
+//         if (results.length === 0) {
+//             return res.status(401).json({ error: 'Invalid email or password' });
+//         }
 
-        const user = results[0];
+//         const user = results[0];
 
-        // Check password
-        const isMatch = await bcrypt.compare(password, user.password);
-        if (!isMatch) {
-            return res.status(401).json({ error: 'Invalid email or password' });
-        }
+//         // Check password
+//         const isMatch = await (password, user.password);
+//         if (!isMatch) {
+//             return res.status(401).json({ error: 'Invalid email or password' });
+//         }
 
-        // Generate JWT
-        const token = jwt.sign({ userId: user.id }, 'your_jwt_secret', { expiresIn: '1h' });
-        res.json({ token });
-    });
-};
+//         // // Generate a unique token for the session
+//         // const token = crypto.randomBytes(16).toString('hex');
+
+//         // Store the token in the database associated with the user
+//         const updateQuery = 'UPDATE users SET token = ? WHERE id = ?';
+//         db.query(updateQuery, [token, user.id], (err, result) => {
+//             if (err) {
+//                 console.error('Database error:', err);
+//                 return res.status(500).json({ error: 'Database error' });
+//             }
+
+//             // Send the token to the client to be stored in localStorage
+//             res.json({ token });
+//         });
+//     });
+// };

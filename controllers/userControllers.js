@@ -1,11 +1,25 @@
 const db = require('../config/db');
 
-// exports.getUsers = (req, res) => {
-//     const query = 'SELECT * FROM users';
-//     db.query(query, (error, results) => {
-//         if (error) {
-//             return res.status(500).json({ error });
-//         }
-//         res.status(200).json(results);
-//     });
-// };
+exports.register = async (req, res) => {
+    const { category, price, date } = req.body;
+
+    try {
+        if (!category || !price || !date) {
+            return res.status(400).json({ error: 'All fields are required' });
+        }
+
+        const query = 'INSERT INTO expenses (category, price, date) VALUES (?,?,?)';
+
+        db.query(query, [category, price, date], (err, result) => {
+            if (err) {
+                console.error('Database error:', err);
+                return res.status(500).json({ error: 'Database error' });
+            }
+            res.status(201).json({ message: 'User registered successfully' });
+        });
+    } catch (error) {
+        console.error('Internal error:', error);
+        res.status(500).json({ error: 'Internal server error' });
+    }
+};
+
