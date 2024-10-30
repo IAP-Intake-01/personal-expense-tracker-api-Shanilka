@@ -18,6 +18,21 @@ const db = mysql.createConnection({
     database: "my_expenses"
 })
 
+app.post('/reg_user', (req, res) => {
+    sql = "INSERT INTO users (`name`,`email`, `password`) VALUES (?,?,?)";
+
+    const values = [
+        req.body.name,
+        req.body.email,
+        req.body.password,
+    ]
+    db.query(sql, values, (err, result) => {
+        if (err) return res.json({ message: "Register UnSuccessfully " + err })
+        return req.json({ success: "Register Successfully" })
+    })
+});
+
 app.listen(port, () => {
     console.log(`Server is Listening ${port}`)
 })
+
