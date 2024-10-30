@@ -23,3 +23,16 @@ exports.saveData = async (req, res) => {
     }
 };
 
+
+exports.getAllExpenses = (req, res) => {
+    const query = 'SELECT * FROM expenses';
+
+    db.query(query, (err, results) => {
+        if (err) {
+            console.error('Database error:', err);
+            return res.status(500).json({ error: 'Database error' });
+        }
+
+        res.json(results);
+    });
+};
