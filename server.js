@@ -13,9 +13,9 @@ app.use(cors());
 const authRoutes = require('./routes/authRoutes');
 app.use('/api', authRoutes);
 
-const userRoutes = require('./routes/userRoutes');
-app.use('/api', userRoutes)
-app.use('/api', userRoutes);
+const expensesRoutes = require('./routes/expensesRoutes');
+app.use('/api', expensesRoutes)
+app.use('/api', expensesRoutes);
 
 app.listen(PORT, () => {
     console.log(`Server is running on http://localhost:${PORT}`);
