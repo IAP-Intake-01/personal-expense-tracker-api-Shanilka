@@ -55,3 +55,29 @@ exports.deleteExpense = (req, res) => {
         res.status(200).json({ message: 'Expense deleted successfully' });
     });
 };
+
+
+// controllers/expenseController.js
+exports.updateExpense = (req, res) => {
+    const { id, category, price, date } = req.body;
+
+    // Ensure that all necessary fields are provided
+    if (!id || !category || !price || !date) {
+        return res.status(400).json({ error: 'ID, category, price, and date are required' });
+    }
+
+    const updateExpenseQuery = 'UPDATE expenses SET category = ?, price = ?, date = ? WHERE id = ?';
+
+    db.query(updateExpenseQuery, [category, price, date, id], (err, result) => {
+        if (err) {
+            console.error('Error updating expense:', err);
+            return res.status(500).json({ error: 'Database error' });
+        }
+
+        if (result.affectedRows === 0) {
+            return res.status(404).json({ error: 'Expense not found' });
+        }
+
+        res.status(200).json({ message: 'Expense updated successfully' });
+    });
+};
