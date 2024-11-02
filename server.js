@@ -16,6 +16,9 @@ app.use('/api', authRoutes);
 const expensesRoutes = require('./routes/expensesRoutes');
 app.use('/api', expensesRoutes);
 
+const dashbordRoutes = require('./routes/dashbordRoutes')
+app.use('/api', dashbordRoutes);
+
 app.listen(PORT, () => {
     console.log(`Server is running on http://localhost:${PORT}`);
 });
