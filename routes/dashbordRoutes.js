@@ -3,6 +3,6 @@ const router = express.Router();
 const dashbordController = require('../controllers/dashbordController')
 
 router.get('/getLast7dayData', dashbordController.getlast7day);
-router.get('/getCatogoryPricesum', dashbordController.getCatagorySum);
+router.get('/getCategoryTotals', dashbordController.getCatagorySum);
 
 module.exports = router;
