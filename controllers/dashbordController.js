@@ -19,7 +19,7 @@ ORDER BY category;
 };
 
 
-app.getCatagorySum = (req, res) => {
+exports.getCatagorySum = (req, res) => {
     const query = `
         SELECT category, SUM(price) as total
         FROM expenses
