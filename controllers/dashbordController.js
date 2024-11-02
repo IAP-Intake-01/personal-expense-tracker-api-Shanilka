@@ -2,11 +2,16 @@ const db = require('../config/db');
 
 exports.getlast7day = async (req, res) => {
     const query = `
-      SELECT category, SUM(price) AS total
-FROM expenses
-WHERE date >= CURDATE() - INTERVAL 6 DAY
-GROUP BY category
-ORDER BY category;
+      SELECT 
+    category, 
+    SUM(price) AS total 
+FROM 
+    expenses
+WHERE 
+    date >= DATE_SUB(CURDATE(), INTERVAL 1 MONTH)
+GROUP BY 
+    category;
+
 
     `;
     db.query(query, (err, results) => {
@@ -21,9 +26,16 @@ ORDER BY category;
 
 exports.getCatagorySum = (req, res) => {
     const query = `
-        SELECT category, SUM(price) as total
-        FROM expenses
-        GROUP BY category
+        SELECT 
+    category, 
+    SUM(price) AS total
+FROM 
+    expenses
+WHERE 
+    date >= DATE_SUB(CURDATE(), INTERVAL 7 DAY)
+GROUP BY 
+    category;
+
     `;
 
     db.query(query, (err, results) => {
