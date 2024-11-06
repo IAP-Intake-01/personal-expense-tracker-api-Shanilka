@@ -120,7 +120,7 @@ exports.getCatogoryTotal = (req, res) => {
     const query = `
         SELECT category, SUM(price) AS total_price
         FROM expenses
-        WHERE category IN ('food', 'transport', 'education', 'shoping', 'other')
+        WHERE category IN ('Foods', 'Transport', 'education', 'shoping', 'other')
         GROUP BY category
     `;
 

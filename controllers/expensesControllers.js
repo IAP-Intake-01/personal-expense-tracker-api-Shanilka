@@ -2,7 +2,7 @@ const db = require('../config/db');
 
 // save funtion
 exports.saveData = async (req, res) => {
-    const { category, price, date } = req.body;
+    const { category, price, date, itemname } = req.body;
 
     const getMaxIdQuery = 'SELECT COALESCE(MAX(id), 0) + 1 AS newId FROM expenses';
     const insertExpenseQuery = 'INSERT INTO expenses (id, category, price, date,itemname) VALUES (?, ?, ?, ?,?)';
