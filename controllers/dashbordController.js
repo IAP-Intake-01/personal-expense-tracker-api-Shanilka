@@ -5,11 +5,11 @@ exports.getlast7day = async (req, res) => {
       SELECT 
     category, 
     SUM(price) AS total 
-FROM 
+    FROM 
     expenses
-WHERE 
+    WHERE 
     date >= DATE_SUB(CURDATE(), INTERVAL 1 MONTH)
-GROUP BY 
+    GROUP BY 
     category;
 
 
@@ -29,11 +29,11 @@ exports.getCatagorySum = async (req, res) => {
         SELECT 
     category, 
     SUM(price) AS total
-FROM 
+    FROM 
     expenses
-WHERE 
+    WHERE 
     date >= DATE_SUB(CURDATE(), INTERVAL 7 DAY)
-GROUP BY 
+    GROUP BY 
     category;
 
     `;
@@ -81,13 +81,13 @@ exports.getExpensesTotal = async (req, res) => {
         // Average calculation (example: over the last 12 months)
         const averageQuery = `
             SELECT AVG(monthly_total) AS average
-FROM (
-    SELECT SUM(price) AS monthly_total
-    FROM expenses
-    GROUP BY YEAR(date), MONTH(date)
-    ORDER BY YEAR(date) DESC, MONTH(date) DESC
-    LIMIT 12
-) AS monthly_totals;
+            FROM (
+            SELECT SUM(price) AS monthly_total
+            FROM expenses
+            GROUP BY YEAR(date), MONTH(date)
+            ORDER BY YEAR(date) DESC, MONTH(date) DESC
+            LIMIT 12
+            ) AS monthly_totals;
 
         `;
 
@@ -113,6 +113,21 @@ FROM (
     } catch (error) {
         console.error("Failed to fetch data in /expense-summary:", error);
         res.status(500).json({ error: 'Failed to fetch data in /expense-summary' });
+    }
+};
+
+exports.getCatogoryTotalPrice = async (req, res) => {
+    try {
+        const [results] = await db.execute(`
+            SELECT category, SUM(price) AS total_price
+            FROM expenses
+            WHERE category IN ('food', 'transport', 'education', 'entertainment', 'other')
+            GROUP BY category
+        `);
+        res.json(results);
+    } catch (error) {
+        console.error('Error fetching category totals:', error);
+        res.status(500).json({ error: 'Failed to retrieve category totals' });
     }
 };
 
