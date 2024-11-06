@@ -116,20 +116,25 @@ exports.getExpensesTotal = async (req, res) => {
     }
 };
 
-exports.getCatogoryTotalPrice = async (req, res) => {
-    try {
-        const [results] = await db.execute(`
-            SELECT category, SUM(price) AS total_price
-            FROM expenses
-            WHERE category IN ('food', 'transport', 'education', 'entertainment', 'other')
-            GROUP BY category
-        `);
-        res.json(results);
-    } catch (error) {
-        console.error('Error fetching category totals:', error);
-        res.status(500).json({ error: 'Failed to retrieve category totals' });
-    }
+exports.getCatogoryTotal = (req, res) => {
+    const query = `
+        SELECT category, SUM(price) AS total_price
+        FROM expenses
+        WHERE category IN ('food', 'transport', 'education', 'shoping', 'other')
+        GROUP BY category
+    `;
+
+    db.query(query, (error, results) => {
+        if (error) {
+            console.error('Error fetching category totals:', error);
+            res.status(500).json({ error: 'Failed to retrieve category totals' });
+        } else {
+            res.json(results); // Send the results directly
+        }
+    });
 };
 
 
+
 // getExpensesTotal
+// entertainment

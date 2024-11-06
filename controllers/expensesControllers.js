@@ -2,10 +2,10 @@ const db = require('../config/db');
 
 // save funtion
 exports.saveData = async (req, res) => {
-    const { category, price, date } = req.body;
+    const { category, price, date, itemname } = req.body;
 
     const getMaxIdQuery = 'SELECT COALESCE(MAX(id), 0) + 1 AS newId FROM expenses';
-    const insertExpenseQuery = 'INSERT INTO expenses (id, category, price, date) VALUES (?, ?, ?, ?)';
+    const insertExpenseQuery = 'INSERT INTO expenses (id, category, price, date,itemname) VALUES (?, ?, ?, ?,?)';
 
     db.query(getMaxIdQuery, (err, result) => {
         if (err) {
@@ -15,7 +15,7 @@ exports.saveData = async (req, res) => {
 
         const newId = result[0].newId;
 
-        db.query(insertExpenseQuery, [newId, category, price, date], (err, result) => {
+        db.query(insertExpenseQuery, [newId, category, price, date, itemname], (err, result) => {
             if (err) {
                 console.error('Error inserting expense:', err);
                 return res.status(500).json({ error: 'Database error' });
@@ -59,14 +59,14 @@ exports.deleteExpense = (req, res) => {
 
 // controllers/expenseController.js
 exports.updateExpense = (req, res) => {
-    const { id, category, price, date } = req.body;
+    const { id, category, price, date, itemname } = req.body;
 
     // Ensure that all necessary fields are provided
-    if (!id || !category || !price || !date) {
+    if (!id || !category || !price || !date || !itemname) {
         return res.status(400).json({ error: 'ID, category, price, and date are required' });
     }
 
-    const updateExpenseQuery = 'UPDATE expenses SET category = ?, price = ?, date = ? WHERE id = ?';
+    const updateExpenseQuery = 'UPDATE expenses SET category = ?, price = ?, date = ?, itemname = ? WHERE id = ?';
 
     db.query(updateExpenseQuery, [category, price, date, id], (err, result) => {
         if (err) {
