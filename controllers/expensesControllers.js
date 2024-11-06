@@ -2,7 +2,7 @@ const db = require('../config/db');
 
 // save funtion
 exports.saveData = async (req, res) => {
-    const { category, price, date, itemname } = req.body;
+    const { category, price, date } = req.body;
 
     const getMaxIdQuery = 'SELECT COALESCE(MAX(id), 0) + 1 AS newId FROM expenses';
     const insertExpenseQuery = 'INSERT INTO expenses (id, category, price, date,itemname) VALUES (?, ?, ?, ?,?)';
@@ -66,9 +66,9 @@ exports.updateExpense = (req, res) => {
         return res.status(400).json({ error: 'ID, category, price, and date are required' });
     }
 
-    const updateExpenseQuery = 'UPDATE expenses SET category = ?, price = ?, date = ?, itemname = ? WHERE id = ?';
+    const updateExpenseQuery = 'UPDATE expenses SET category = ?, price = ?, date = ?,  itemname = ? WHERE id = ?';
 
-    db.query(updateExpenseQuery, [category, price, date, id], (err, result) => {
+    db.query(updateExpenseQuery, [category, price, date, itemname, id], (err, result) => {
         if (err) {
             console.error('Error updating expense:', err);
             return res.status(500).json({ error: 'Database error' });
