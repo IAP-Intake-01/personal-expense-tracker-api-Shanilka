@@ -48,19 +48,22 @@ exports.login = (req, res) => {
 
         const user = results[0];
 
-        const isMatch = await (password, user.password);
+        const isMatch = await bcrypt.compare(password, user.password);
         if (!isMatch) {
             return res.status(401).json({ error: 'Invalid email or password' });
         }
 
-        const updateQuery = 'UPDATE users SET token = ? WHERE id = ?';
-        db.query(updateQuery, [token, user.id], (err, result) => {
+        // Assuming you have user authentication logic and a token generation step here...
+
+        // Filter and fetch user-specific data:
+        const getUserExpensesQuery = 'SELECT * FROM expenses WHERE user_id = ?';
+        db.query(getUserExpensesQuery, [user.id], (err, expenses) => {
             if (err) {
                 console.error('Database error:', err);
                 return res.status(500).json({ error: 'Database error' });
             }
 
-            res.json({ token });
+            res.json({ message: 'Login successful', token, expenses });
         });
     });
 };
