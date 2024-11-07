@@ -25,20 +25,25 @@ exports.getlast7day = async (req, res) => {
 
 
 exports.getCatagorySum = async (req, res) => {
+    const userEmail = req.query.userEmail; // Use req.query to get userEmail from the request query string
+
+    // Updated SQL query with userEmail filter
     const query = `
         SELECT 
     category, 
-    SUM(price) AS total
-    FROM 
+    SUM(price) AS total_spent
+FROM 
     expenses
-    WHERE 
+WHERE 
     date >= DATE_SUB(CURDATE(), INTERVAL 7 DAY)
-    GROUP BY 
-    category;
+    AND userEmail = ? 
+GROUP BY 
+    category
+WITH ROLLUP;  
 
     `;
 
-    db.query(query, (err, results) => {
+    db.query(query, [userEmail], (err, results) => {
         if (err) {
             console.error('Error fetching data:', err);
             res.status(500).json({ error: 'Database query error' });
@@ -52,6 +57,7 @@ exports.getCatagorySum = async (req, res) => {
         }
     });
 };
+
 
 // Backend code
 const getMonthlyExpenses = async (userEmail, monthOffset) => {
@@ -130,7 +136,7 @@ exports.getCatogoryTotal = (req, res) => {
         SELECT category, SUM(price) AS total_price
         FROM expenses
         WHERE userEmail = ?  -- Filter by user email
-        AND category IN ('Foods', 'Transport', 'Education', 'Shopping', 'Other')  -- Ensure correct categories
+        AND category IN ('Foods', 'Transport', 'Education', 'shoping', 'Other')  -- Ensure correct categories
         GROUP BY category
     `;
 
