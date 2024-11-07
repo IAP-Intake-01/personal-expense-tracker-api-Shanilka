@@ -31,39 +31,41 @@ exports.register = async (req, res) => {
 exports.login = (req, res) => {
     const { email, password } = req.body;
 
+    // Validate input fields
     if (!email || !password) {
         return res.status(400).json({ error: 'Email and password are required' });
     }
 
+    // Query to find user by email
     const query = 'SELECT * FROM users WHERE email = ?';
-    db.query(query, [email], async (err, results) => {
+    db.query(query, [email], (err, results) => {
         if (err) {
             console.error('Database error:', err);
             return res.status(500).json({ error: 'Database error' });
         }
 
+        // Check if user exists
         if (results.length === 0) {
             return res.status(401).json({ error: 'Invalid email or password' });
         }
 
         const user = results[0];
 
-        const isMatch = await bcrypt.compare(password, user.password);
-        if (!isMatch) {
+        // Simple string comparison for plain-text passwords (not recommended for production)
+        if (password !== user.password) {
             return res.status(401).json({ error: 'Invalid email or password' });
         }
 
-        // Assuming you have user authentication logic and a token generation step here...
+        // Token generation logic (replace with actual token generation if needed)
+        // const token = 'dummy_token'; // Replace with real token generation logic
 
-        // Filter and fetch user-specific data:
-        const getUserExpensesQuery = 'SELECT * FROM expenses WHERE user_id = ?';
-        db.query(getUserExpensesQuery, [user.id], (err, expenses) => {
-            if (err) {
-                console.error('Database error:', err);
-                return res.status(500).json({ error: 'Database error' });
+        // Successful login response
+        res.json({
+            message: 'Login successful',
+            userData: {
+                name: user.name,
+                email: user.email
             }
-
-            res.json({ message: 'Login successful', token, expenses });
         });
     });
 };

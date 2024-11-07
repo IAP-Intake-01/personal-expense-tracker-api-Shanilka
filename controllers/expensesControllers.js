@@ -2,11 +2,17 @@ const db = require('../config/db');
 
 // save funtion
 exports.saveData = async (req, res) => {
-    const { category, price, date, itemname, userId } = req.body; // Include userId
+    const { category, price, date, itemname, userEmail } = req.body;
 
-    const insertExpenseQuery = 'INSERT INTO expenses (category, price, date, itemname, user_id) VALUES (?, ?, ?, ?, ?)';
+    // Assuming 'req.userEmail' is populated from the user's session, token, etc.
 
-    db.query(insertExpenseQuery, [category, price, date, itemname, userId], (err, result) => {
+    if (!userEmail) {
+        return res.status(400).json({ error: 'User not authenticated' });
+    }
+
+    const insertExpenseQuery = 'INSERT INTO expenses (category, price, date, itemname,  userEmail) VALUES (?, ?, ?, ?, ?)';
+
+    db.query(insertExpenseQuery, [category, price, date, itemname, userEmail], (err, result) => {
         if (err) {
             console.error('Error inserting expense:', err);
             return res.status(500).json({ error: 'Database error' });
@@ -14,6 +20,7 @@ exports.saveData = async (req, res) => {
         res.status(201).json({ message: 'Expense added successfully', expenseId: result.insertId });
     });
 };
+
 
 //  getAll funtion
 exports.getAllExpenses = (req, res) => {
