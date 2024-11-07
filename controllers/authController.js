@@ -10,8 +10,6 @@ exports.register = async (req, res) => {
             return res.status(400).json({ error: 'All fields are required' });
         }
 
-        // const hashedPassword = await bcrypt.hash(password, 10);
-
         const query = 'INSERT INTO users (name, email, password) VALUES (?, ?, ?)';
 
         db.query(query, [name, email, password], (err, result) => {

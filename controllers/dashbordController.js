@@ -54,15 +54,16 @@ exports.getCatagorySum = async (req, res) => {
 };
 
 // Backend code
-const getMonthlyExpenses = async (monthOffset) => {
+const getMonthlyExpenses = async (userEmail, monthOffset) => {
     return new Promise((resolve, reject) => {
         const query = `
             SELECT SUM(price) AS total
             FROM expenses
-            WHERE MONTH(date) = MONTH(CURDATE() - INTERVAL ${monthOffset} MONTH)
-              AND YEAR(date) = YEAR(CURDATE() - INTERVAL ${monthOffset} MONTH);
+            WHERE userEmail = ?
+            AND MONTH(date) = MONTH(CURDATE() - INTERVAL ${monthOffset} MONTH)
+            AND YEAR(date) = YEAR(CURDATE() - INTERVAL ${monthOffset} MONTH);
         `;
-        db.query(query, (err, results) => {
+        db.query(query, [userEmail], (err, results) => {
             if (err) {
                 console.error("Database error in getMonthlyExpenses for monthOffset " + monthOffset, err);
                 reject(err);
@@ -74,28 +75,30 @@ const getMonthlyExpenses = async (monthOffset) => {
 };
 
 exports.getExpensesTotal = async (req, res) => {
-    try {
-        const currentMonthTotal = await getMonthlyExpenses(0);
-        const previousMonthTotal = await getMonthlyExpenses(1);
+    const userEmail = req.params.userEmail;
 
-        // Average calculation (example: over the last 12 months)
+    try {
+        // Get current and previous month totals
+        const currentMonthTotal = await getMonthlyExpenses(userEmail, 0);  // Current month
+        const previousMonthTotal = await getMonthlyExpenses(userEmail, 1);  // Previous month
+
+        // SQL query to get the average of the last 12 months' expenses
         const averageQuery = `
             SELECT AVG(monthly_total) AS average
             FROM (
-            SELECT SUM(price) AS monthly_total
-            FROM expenses
-            GROUP BY YEAR(date), MONTH(date)
-            ORDER BY YEAR(date) DESC, MONTH(date) DESC
-            LIMIT 12
+                SELECT SUM(price) AS monthly_total
+                FROM expenses
+                WHERE userEmail = ?
+                GROUP BY YEAR(date), MONTH(date)
+                ORDER BY YEAR(date) DESC, MONTH(date) DESC
+                LIMIT 12
             ) AS monthly_totals;
-
         `;
 
-        db.query(averageQuery, (err, results) => {
+        db.query(averageQuery, [userEmail], (err, results) => {
             if (err) {
                 console.error("Database error in averageQuery:", err);
-                res.status(500).json({ error: 'Database error in averageQuery' });
-                return;
+                return res.status(500).json({ error: 'Database error in averageQuery' });
             }
 
             const average = results[0].average || 0;
@@ -104,33 +107,42 @@ exports.getExpensesTotal = async (req, res) => {
                 : 0;
 
             res.json({
+                userEmail,
                 currentMonthTotal,
                 previousMonthTotal,
                 average,
                 growthPercentage,
             });
         });
+
     } catch (error) {
-        console.error("Failed to fetch data in /expense-summary:", error);
-        res.status(500).json({ error: 'Failed to fetch data in /expense-summary' });
+        console.error("Error fetching data:", error);
+        res.status(500).json({ error: 'Failed to fetch data' });
     }
 };
 
+
 exports.getCatogoryTotal = (req, res) => {
+    const userEmail = req.params.userEmail;  // Get the user email from the URL parameter
+
+    // SQL query to get the total expenses per category for the specific user
     const query = `
         SELECT category, SUM(price) AS total_price
         FROM expenses
-        WHERE category IN ('Foods', 'Transport', 'education', 'shoping', 'other')
+        WHERE userEmail = ?  -- Filter by user email
+        AND category IN ('Foods', 'Transport', 'Education', 'Shopping', 'Other')  -- Ensure correct categories
         GROUP BY category
     `;
 
-    db.query(query, (error, results) => {
+    // Query execution
+    db.query(query, [userEmail], (error, results) => {
         if (error) {
             console.error('Error fetching category totals:', error);
-            res.status(500).json({ error: 'Failed to retrieve category totals' });
-        } else {
-            res.json(results); // Send the results directly
+            return res.status(500).json({ error: 'Failed to retrieve category totals' });
         }
+
+        // Send the results to the frontend
+        res.json(results);
     });
 };
 

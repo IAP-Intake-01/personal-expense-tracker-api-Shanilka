@@ -23,10 +23,13 @@ exports.saveData = async (req, res) => {
 
 
 //  getAll funtion
-exports.getAllExpenses = (req, res) => {
-    const query = 'SELECT * FROM expenses';
+exports.getExpensesByUser = (req, res) => {
+    const { userEmail } = req.params; // Assuming `userEmail` is passed as a URL parameter
 
-    db.query(query, (err, results) => {
+    // Updated query to filter by `userEmail`
+    const query = 'SELECT * FROM expenses WHERE userEmail = ?';
+
+    db.query(query, [userEmail], (err, results) => {
         if (err) {
             console.error('Database error:', err);
             return res.status(500).json({ error: 'Database error' });
@@ -35,6 +38,7 @@ exports.getAllExpenses = (req, res) => {
         res.json(results);
     });
 };
+
 
 // delete funtion
 exports.deleteExpense = (req, res) => {
