@@ -2,26 +2,16 @@ const db = require('../config/db');
 
 // save funtion
 exports.saveData = async (req, res) => {
-    const { category, price, date, itemname } = req.body;
+    const { category, price, date, itemname, userId } = req.body; // Include userId
 
-    const getMaxIdQuery = 'SELECT COALESCE(MAX(id), 0) + 1 AS newId FROM expenses';
-    const insertExpenseQuery = 'INSERT INTO expenses (id, category, price, date,itemname) VALUES (?, ?, ?, ?,?)';
+    const insertExpenseQuery = 'INSERT INTO expenses (category, price, date, itemname, user_id) VALUES (?, ?, ?, ?, ?)';
 
-    db.query(getMaxIdQuery, (err, result) => {
+    db.query(insertExpenseQuery, [category, price, date, itemname, userId], (err, result) => {
         if (err) {
-            console.error('Error retrieving max ID:', err);
+            console.error('Error inserting expense:', err);
             return res.status(500).json({ error: 'Database error' });
         }
-
-        const newId = result[0].newId;
-
-        db.query(insertExpenseQuery, [newId, category, price, date, itemname], (err, result) => {
-            if (err) {
-                console.error('Error inserting expense:', err);
-                return res.status(500).json({ error: 'Database error' });
-            }
-            res.status(201).json({ message: 'Expense added successfully', expenseId: newId });
-        });
+        res.status(201).json({ message: 'Expense added successfully', expenseId: result.insertId });
     });
 };
 
