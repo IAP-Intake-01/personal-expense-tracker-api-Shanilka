@@ -1,60 +1,49 @@
 const db = require('../config/db');
 
 exports.getlast7day = async (req, res) => {
+    const userEmail = req.query.userEmail;
+
+    if (!userEmail) {
+        return res.status(400).send({ message: 'userEmail is required' });
+    }
+
     const query = `
-      SELECT 
-    category, 
-    SUM(price) AS total 
-    FROM 
-    expenses
-    WHERE 
-    date >= DATE_SUB(CURDATE(), INTERVAL 1 MONTH)
-    GROUP BY 
-    category;
-
-
+        SELECT category, SUM(price) as total
+        FROM expenses
+        WHERE userEmail = ? AND date >= DATE_SUB(CURDATE(), INTERVAL 7 DAY)
+        GROUP BY category
     `;
-    db.query(query, (err, results) => {
-        if (err) {
-            res.status(500).send(err);
-            return;
-        }
-        res.json(results);
-    });
+
+    try {
+        db.query(query, [userEmail], (error, results) => {
+            if (error) {
+                return res.status(500).send({ message: 'Error fetching data', error });
+            }
+            res.status(200).send(results);
+        });
+    } catch (error) {
+        res.status(500).send({ message: 'Server error', error });
+    }
 };
 
 
 exports.getCatagorySum = async (req, res) => {
-    const userEmail = req.query.userEmail; // Use req.query to get userEmail from the request query string
+    const { userEmail } = req.params;
 
-    // Updated SQL query with userEmail filter
+    // SQL query to calculate total amount per category for the specified user
     const query = `
-        SELECT 
-    category, 
-    SUM(price) AS total_spent
-FROM 
-    expenses
-WHERE 
-    date >= DATE_SUB(CURDATE(), INTERVAL 7 DAY)
-    AND userEmail = ? 
-GROUP BY 
-    category
-WITH ROLLUP;  
-
+        SELECT category, SUM(price) AS value
+        FROM expenses
+        WHERE userEmail = ?
+        GROUP BY category
     `;
 
     db.query(query, [userEmail], (err, results) => {
         if (err) {
-            console.error('Error fetching data:', err);
-            res.status(500).json({ error: 'Database query error' });
-        } else {
-            // Format results as expected for the Pie chart
-            const formattedResults = results.map(row => ({
-                name: row.category,
-                value: row.total,
-            }));
-            res.json(formattedResults);
+            console.error('Database query error:', err);
+            return res.status(500).json({ error: 'Internal Server Error' });
         }
+        res.json(results); // Send aggregated data to frontend
     });
 };
 
